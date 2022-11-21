@@ -21,7 +21,7 @@ def similarity(u, v):
     return sim
 
 # Cria um grafo
-G = nx.cycle_graph(6)
+G = nx.cycle_graph(100)
 
 nodes = list(G.nodes)
 #print("List of nodes in graph:", nodes)
