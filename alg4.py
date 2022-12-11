@@ -1,11 +1,11 @@
 import networkx as nx
 import itertools
+import random
 #import matplotlib.pyplot as plt
 
-G = nx.fast_gnp_random_graph(300, 0.1)
+#G = nx.fast_gnp_random_graph(300, 0.1)
+G = nx.complete_graph(5)
 nodes = list(G.nodes)
-#print("List of nodes in graph:", nodes)
-#print("")
 
 max_similarity = 0
 min_similarity = 1
@@ -18,7 +18,7 @@ for comb in itertools.combinations(nodes, 2):
 
 for node in nodes:
     for i in G.neighbors(node):
-        for j in nodes:
+        for j in random.choices(nodes, k=30):
             if i < j:
                 menor = i
                 maior = j
@@ -37,6 +37,8 @@ for node in nodes:
     #print("")
 
 for comb in itertools.combinations(nodes, 2):
+    if similarities[comb][1] == 0:
+        continue
     sim = similarities[comb][0] / similarities[comb][1]
     if sim < min_similarity:
         min_similarity = sim
