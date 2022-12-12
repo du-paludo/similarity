@@ -1,11 +1,8 @@
 import networkx as nx
 import itertools
-#import matplotlib.pyplot as plt
 
 G = nx.cycle_graph(100)
 nodes = list(G.nodes)
-#print("List of nodes in graph:", nodes)
-#print("")
 
 max_similarity = 0
 min_similarity = 1
@@ -26,8 +23,6 @@ for node in nodes:
             similarities[comb][0] += 1
         if i in G.neighbors(node) or j in G.neighbors(node):
             similarities[comb][1] += 1
-        #print(i, j, similarities[comb])
-    #print("")
 
 for comb in itertools.combinations(nodes, 2):
     sim = similarities[comb][0] / similarities[comb][1]
@@ -43,6 +38,3 @@ average_similarity = sum_similarity/counter
 print("Maximum similarity:", max_similarity)
 print("Minimum similarity:", min_similarity)
 print("Average similarity:", average_similarity)
-
-#nx.draw(G)
-#plt.show()

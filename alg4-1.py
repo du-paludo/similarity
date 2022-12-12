@@ -4,7 +4,7 @@ import random
 
 # -- Cria grafo --
 G = nx.fast_gnp_random_graph(300, 0.1)
-#G = nx.cycle_graph(10)
+#G = nx.complete_graph(5)
 nodes = list(G.nodes)
 
 # -- Inicializa variáveis --
@@ -16,26 +16,32 @@ counter = 0
 # -- Inicializa dicionário que guarda similaridades --
 similarities = {}
 for comb in itertools.combinations(nodes, 2):
-    similarities[frozenset(comb)] = [0, 0, 0]
+    similarities[comb] = [0, 0, 0]
 
 # -- Algoritmo --
 for node in nodes:
     for i in G.neighbors(node):
         for j in random.choices(nodes, k=10):
-            if j == i or j == node or similarities[frozenset((i, j))][2] == 1:
+            if i < j:
+                menor = i
+                maior = j
+            else:
+                menor = j
+                maior = i
+            if j == i or j == node or similarities[(menor, maior)][2] == 1:
                 continue
             if j in G.neighbors(node):
-                similarities[frozenset((i, j))][0] += 1
-            similarities[frozenset((i, j))][1] += 1
-            similarities[frozenset((i, j))][2] = 1
+                similarities[(menor, maior)][0] += 1
+            similarities[(menor, maior)][1] += 1
+            similarities[(menor, maior)][2] = 1
     for comb in itertools.combinations(nodes, 2):
-        similarities[frozenset(comb)][2] = 0
+        similarities[comb][2] = 0
 
 # -- Calcula similaridades --
 for comb in itertools.combinations(nodes, 2):
-    if comb[0] == comb[1]:
+    if similarities[comb][1] == 0:
         continue
-    sim = similarities[frozenset((i, j))][0] / similarities[frozenset((i, j))][1] 
+    sim = similarities[comb][0] / similarities[comb][1]
     if sim < min_similarity:
         min_similarity = sim
     elif sim > max_similarity:

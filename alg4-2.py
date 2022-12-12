@@ -1,24 +1,28 @@
 import networkx as nx
 import itertools
-#import matplotlib.pyplot as plt
+import random
 
+# -- Cria grafo --
 G = nx.fast_gnp_random_graph(300, 0.1)
 #G = nx.cycle_graph(5)
 nodes = list(G.nodes)
 
+# -- Inicializa variáveis --
 max_similarity = 0
 min_similarity = 1
 sum_similarity = 0
 counter = 0
 
+# -- Inicializa dicionário que guarda similaridades --
 similarities = {}
 for comb in itertools.combinations(nodes, 2):
     similarities[(comb[0], comb[1])] = [0, 0, 0]
     similarities[(comb[1], comb[0])] = [0, 0, 0]
 
+# -- Algoritmo --
 for node in nodes:
     for i in G.neighbors(node):
-        for j in nodes:
+        for j in random.choices(nodes, k=30):
             if j == i or j == node:
                 continue
             if similarities[(i, j)][2] == 1:
@@ -32,6 +36,7 @@ for node in nodes:
         similarities[(comb[0], comb[1])][2] = 0
         similarities[(comb[1], comb[0])][2] = 0
 
+# -- Calcula similaridades --
 for comb in itertools.combinations(nodes, 2):
     sim = (similarities[(comb[0], comb[1])][0] + similarities[(comb[1], comb[0])][0]) / (similarities[(comb[0], comb[1])][1] + similarities[(comb[1], comb[0])][1])
     if sim < min_similarity:
@@ -40,12 +45,9 @@ for comb in itertools.combinations(nodes, 2):
         max_similarity = sim
     sum_similarity += sim
     counter += 1
-
 average_similarity = sum_similarity/counter
 
+# -- Imprime resultados --
 print("Maximum similarity:", max_similarity)
 print("Minimum similarity:", min_similarity)
 print("Average similarity:", average_similarity)
-
-#nx.draw(G)
-#plt.show()

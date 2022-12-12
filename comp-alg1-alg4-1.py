@@ -3,8 +3,6 @@ import itertools
 import random
 import time
 
-# -- ALGORITMO 1 --
-
 def similarity(similarities1, u, v):
     neighbors_u = list(G.neighbors(u))
     # Como u e v não precisam ser vizinhos, remove da lista caso sejam
@@ -54,33 +52,39 @@ print("Average similarity in algorithm 1:", average_similarity)
 print("Time of execution of algorithm 1: %s seconds" % (time.time() - start_time))
 
 
-# -- ALGORITMO 4-2 --
+# -- ALGORITMO 4 --
+
+sum_similarity = 0
+counter = 0
 
 similarities4 = {}
 for comb in itertools.combinations(nodes, 2):
-    similarities4[(comb[0], comb[1])] = [0, 0, 0]
-    similarities4[(comb[1], comb[0])] = [0, 0, 0]
+    similarities4[comb] = [0, 0, 0]
 
 start_time = time.time()
 
 for node in nodes:
     for i in G.neighbors(node):
-        for j in random.choices(nodes, k=30):
-            if j == i or j == node:
-                continue
-            if similarities4[(i, j)][2] == 1:
+        for j in random.choices(nodes, k=200):
+            if i < j:
+                menor = i
+                maior = j
+            else:
+                menor = j
+                maior = i
+            if j == i or j == node or similarities4[(menor, maior)][2] == 1:
                 continue
             if j in G.neighbors(node):
-                similarities4[(i, j)][0] += 1
-            similarities4[(i, j)][1] += 1
-            similarities4[(j, i)][2] = 1
-            similarities4[(i, j)][2] = 1
+                similarities4[(menor, maior)][0] += 1
+            similarities4[(menor, maior)][1] += 1
+            similarities4[(menor, maior)][2] = 1
     for comb in itertools.combinations(nodes, 2):
-        similarities4[(comb[0], comb[1])][2] = 0
-        similarities4[(comb[1], comb[0])][2] = 0
+        similarities4[comb][2] = 0
 
 for comb in itertools.combinations(nodes, 2):
-    sim = (similarities4[(comb[0], comb[1])][0] + similarities4[(comb[1], comb[0])][0]) / (similarities4[(comb[0], comb[1])][1] + similarities4[(comb[1], comb[0])][1])
+    if similarities4[comb][1] == 0:
+        continue
+    sim = similarities4[comb][0] / similarities4[comb][1]
     sum_similarity += sim
     counter += 1
 
@@ -93,4 +97,4 @@ print("Time of execution of algorithm 2: %s seconds" % (time.time() - start_time
 # -- TESTES --
 
 print(similarities1[3, 5][0] / similarities1[3, 5][1])
-print((similarities4[3, 5][0] + similarities4[5, 3][0]) / (similarities4[3, 5][1] + similarities4[5, 3][1]))
+print(similarities4[3, 5][0] / similarities4[3, 5][1])

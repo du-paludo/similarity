@@ -1,4 +1,5 @@
 import networkx as nx
+import itertools
 
 G = nx.cycle_graph(4)
 nodes = list(G.nodes)
@@ -17,12 +18,15 @@ for i in range(number_nodes):
     similarities.append(col)
 
 for node in nodes:
-    for i in G.neighbors(node):
-        for j in nodes:
-            if j == i or j == node:
-                continue
-            if j in G.neighbors(node):
-                similarities[i][j][0] += 1
+    for comb in itertools.combinations(nodes, 2):
+        i = comb[0]
+        j = comb[1]
+        print(comb)
+        if i == node or j == node:
+            continue
+        if i in G.neighbors(node) and j in G.neighbors(node):
+            similarities[i][j][0] += 1
+        if i in G.neighbors(node) or j in G.neighbors(node):
             similarities[i][j][1] += 1
 
 for i in range(len(nodes)):

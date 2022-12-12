@@ -1,8 +1,7 @@
 import networkx as nx
 import itertools
 import random
-
-# -- ALGORITMO 1 --
+import time
 
 def similarity(similarities1, u, v):
     neighbors_u = list(G.neighbors(u))
@@ -25,40 +24,49 @@ def similarity(similarities1, u, v):
 
     return sim
 
-# Cria um grafo
-G = nx.fast_gnp_random_graph(300, 0.3)
-#G = nx.complete_graph(200)
-
+# -- Cria grafo --
+#G = nx.fast_gnp_random_graph(500, 0.4)
+G = nx.powerlaw_cluster_graph(400, 30, 0.3)
+#G = nx.complete_graph(500)
 nodes = list(G.nodes)
+
+
+# -- ALGORITMO 1 --
+
 similarities1 = {}
 for i in range(len(nodes)):
     for j in range(i + 1, len(nodes)):
-        similarities1[(i, j)] = [0, 0]
+        similarities1[(i, j)] = [0., 0.]
 
-sum_similarity = 0
+sum_similarity = 0.
 counter = 0
+
+start_time = time.time()
 
 for i in range(len(nodes)):
     for j in range(i + 1, len(nodes)):
         sum_similarity += similarity(similarities1, nodes[i], nodes[j])
         counter += 1
-
 average_similarity = sum_similarity/counter
+
 print("Average similarity in algorithm 1:", average_similarity)
+print("Time of execution of algorithm 1: %s seconds" % (time.time() - start_time))
 
 
 # -- ALGORITMO 4 --
 
-sum_similarity = 0
+sum_similarity = 0.
 counter = 0
 
 similarities4 = {}
 for comb in itertools.combinations(nodes, 2):
-    similarities4[frozenset(comb)] = [0, 0, 0]
+    similarities4[frozenset(comb)] = [0., 0., 0]
+
+start_time = time.time()
 
 for node in nodes:
     for i in G.neighbors(node):
-        for j in random.choices(nodes, k=30):
+        for j in random.choices(nodes, k=10):
             if j == i or j == node or similarities4[frozenset((i, j))][2] == 1:
                 continue
             if j in G.neighbors(node):
@@ -71,13 +79,15 @@ for node in nodes:
 for comb in itertools.combinations(nodes, 2):
     if comb[0] == comb[1]:
         continue
-    sim = similarities4[frozenset((i, j))][0] / similarities4[frozenset((i, j))][1] 
-    sum_similarity += sim
+    sum_similarity += similarities4[frozenset((i, j))][0] / similarities4[frozenset((i, j))][1] 
     counter += 1
-
 average_similarity = sum_similarity/counter
 
 print("Average similarity in algorithm 2:", average_similarity)
+print("Time of execution of algorithm 2: %s seconds" % (time.time() - start_time))
+
+
+# -- TESTES --
 
 print(similarities1[3, 5][0] / similarities1[3, 5][1])
 print(similarities4[frozenset((3, 5))][0] / similarities4[frozenset((3, 5))][1])

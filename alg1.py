@@ -23,10 +23,7 @@ def similarity(u, v):
 # Cria um grafo
 G = nx.fast_gnp_random_graph(300, 0.1)
 #G = nx.complete_graph(200)
-
 nodes = list(G.nodes)
-#print("List of nodes in graph:", nodes)
-#print("")
 
 max_similarity = 0
 min_similarity = 1
