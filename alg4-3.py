@@ -4,7 +4,7 @@ import random
 #import matplotlib.pyplot as plt
 
 #G = nx.fast_gnp_random_graph(300, 0.1)
-G = nx.cycle_graph(4)
+G = nx.cycle_graph(10)
 nodes = list(G.nodes)
 
 max_similarity = 0
@@ -14,30 +14,24 @@ counter = 0
 
 similarities = {}
 for comb in itertools.combinations(nodes, 2):
-    print(comb)
     similarities[frozenset(comb)] = [0, 0, 0]
-    print(similarities[frozenset(comb)])
-
-print(similarities)
 
 for node in nodes:
     for i in G.neighbors(node):
         for j in random.choices(nodes, k=8):
-            if j == i or j == node:
-                continue
-            print(similarities[frozenset((i, j))])
-            print(i, j)
-            if similarities[frozenset((i, j))][2] == 1:
+            if j == i or j == node or similarities[frozenset((i, j))][2] == 1:
                 continue
             if j in G.neighbors(node):
                 similarities[frozenset((i, j))][0] += 1
             similarities[frozenset((i, j))][1] += 1
             similarities[frozenset((i, j))][2] = 1
     for comb in itertools.combinations(nodes, 2):
-        similarities[frozenset(comb)] = 0
+        similarities[frozenset(comb)][2] = 0
 
 for comb in itertools.combinations(nodes, 2):
-    sim = (similarities[(comb[0], comb[1])][0] + similarities[(comb[1], comb[0])][0]) / (similarities[(comb[0], comb[1])][1] + similarities[(comb[1], comb[0])][1])
+    if comb[0] == comb[1]:
+        continue
+    sim = similarities[frozenset((i, j))][0] / similarities[frozenset((i, j))][1] 
     if sim < min_similarity:
         min_similarity = sim
     elif sim > max_similarity:

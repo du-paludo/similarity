@@ -54,33 +54,24 @@ counter = 0
 
 similarities4 = {}
 for comb in itertools.combinations(nodes, 2):
-    similarities4[comb] = [0, 0, 0]
-#print(similarities)
+    similarities4[frozenset(comb)] = [0, 0, 0]
 
 for node in nodes:
     for i in G.neighbors(node):
-        for j in random.choices(nodes, k=200):
-            if i < j:
-                menor = i
-                maior = j
-            else:
-                menor = j
-                maior = i
-            if j == i or j == node or similarities4[(menor, maior)][2] == 1:
+        for j in random.choices(nodes, k=30):
+            if j == i or j == node or similarities4[frozenset((i, j))][2] == 1:
                 continue
             if j in G.neighbors(node):
-                similarities4[(menor, maior)][0] += 1
-            similarities4[(menor, maior)][1] += 1
-            similarities4[(menor, maior)][2] = 1
+                similarities4[frozenset((i, j))][0] += 1
+            similarities4[frozenset((i, j))][1] += 1
+            similarities4[frozenset((i, j))][2] = 1
     for comb in itertools.combinations(nodes, 2):
-        similarities4[comb][2] = 0
-    #print(i, j, similarities[comb])
-    #print("")
+        similarities4[frozenset(comb)][2] = 0
 
 for comb in itertools.combinations(nodes, 2):
-    if similarities4[comb][1] == 0:
+    if comb[0] == comb[1]:
         continue
-    sim = similarities4[comb][0] / similarities4[comb][1]
+    sim = similarities4[frozenset((i, j))][0] / similarities4[frozenset((i, j))][1] 
     sum_similarity += sim
     counter += 1
 
@@ -89,4 +80,4 @@ average_similarity = sum_similarity/counter
 print("Average similarity in algorithm 2:", average_similarity)
 
 print(similarities1[3, 5][0] / similarities1[3, 5][1])
-print(similarities4[3, 5][0] / similarities4[3, 5][1])
+print(similarities4[frozenset((3, 5))][0] / similarities4[frozenset((3, 5))][1])
