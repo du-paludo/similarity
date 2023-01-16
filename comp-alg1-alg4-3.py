@@ -2,8 +2,9 @@ import networkx as nx
 import itertools
 import random
 import time
+import math
 
-def similarity(similarities1, u, v):
+def similarity(sim1, u, v):
     neighbors_u = list(G.neighbors(u))
     # Como u e v não precisam ser vizinhos, remove da lista caso sejam
     if v in neighbors_u:
@@ -18,76 +19,90 @@ def similarity(similarities1, u, v):
     common_neighbors = list(nx.common_neighbors(G, u, v))
     len_common = len(common_neighbors)
 
-    similarities1[(u, v)][0] = len_common
-    similarities1[(u, v)][1] = len_u + len_v - len_common
-    sim = similarities1[(u, v)][0]/similarities1[(u, v)][1]
+    if (len_u + len_v - len_common) == 0:
+        sim1[(u, v)] = 0
+    else:
+        sim1[(u, v)] = len_common / (len_u + len_v - len_common)
 
-    return sim
 
 # -- Cria grafo --
-#G = nx.fast_gnp_random_graph(500, 0.4)
-G = nx.powerlaw_cluster_graph(400, 30, 0.3)
+
+n = 300
+p = 0.3
+G = nx.fast_gnp_random_graph(n, p)
+#G = nx.gnp_random_graph(n, p)
+#G = nx.powerlaw_cluster_graph(400, 30, 0.3)
 #G = nx.complete_graph(500)
 nodes = list(G.nodes)
 
 
 # -- ALGORITMO 1 --
 
-similarities1 = {}
-for i in range(len(nodes)):
-    for j in range(i + 1, len(nodes)):
-        similarities1[(i, j)] = [0., 0.]
-
-sum_similarity = 0.
-counter = 0
+sim1 = {}
 
 start_time = time.time()
 
 for i in range(len(nodes)):
     for j in range(i + 1, len(nodes)):
-        sum_similarity += similarity(similarities1, nodes[i], nodes[j])
-        counter += 1
-average_similarity = sum_similarity/counter
+        similarity(sim1, nodes[i], nodes[j])
 
-print("Average similarity in algorithm 1:", average_similarity)
 print("Time of execution of algorithm 1: %s seconds" % (time.time() - start_time))
 
 
-# -- ALGORITMO 4 --
+# -- ALGORITMO 2 --
 
-sum_similarity = 0.
-counter = 0
-
-similarities4 = {}
-for comb in itertools.combinations(nodes, 2):
-    similarities4[frozenset(comb)] = [0., 0., 0]
+sim2 = {}
+for i in range(len(nodes)):
+    for j in range(i + 1, len(nodes)):
+        sim2[frozenset((i, j))] = [0, 0, 0]
+signal_array = {}
 
 start_time = time.time()
 
 for node in nodes:
     for i in G.neighbors(node):
-        for j in random.choices(nodes, k=10):
-            if j == i or j == node or similarities4[frozenset((i, j))][2] == 1:
+    #for i in random.choices(nodes, k=int(math.log(n, 1.1)/2)):
+        #for j in random.choices(nodes, k=int(math.log(n, 1.1))):
+        for j in random.choices(nodes, k=30):
+        #for j in random.sample(nodes, k=n):
+            if j == i or j == node or (frozenset((i, j)) in signal_array):
                 continue
-            if j in G.neighbors(node):
-                similarities4[frozenset((i, j))][0] += 1
-            similarities4[frozenset((i, j))][1] += 1
-            similarities4[frozenset((i, j))][2] = 1
-    for comb in itertools.combinations(nodes, 2):
-        similarities4[frozenset(comb)][2] = 0
+            if i in G.neighbors(node) and j in G.neighbors(node):
+                sim2[frozenset((i, j))][0] += 1
+            if i in G.neighbors(node) or j in G.neighbors(node):
+                sim2[frozenset((i, j))][1] += 1
+            signal_array[frozenset((i, j))] = 0
+    signal_array.clear()
 
-for comb in itertools.combinations(nodes, 2):
-    if comb[0] == comb[1]:
-        continue
-    sum_similarity += similarities4[frozenset((i, j))][0] / similarities4[frozenset((i, j))][1] 
-    counter += 1
-average_similarity = sum_similarity/counter
-
-print("Average similarity in algorithm 2:", average_similarity)
 print("Time of execution of algorithm 2: %s seconds" % (time.time() - start_time))
+
+for i in range(len(nodes)):
+    for j in range(i + 1, len(nodes)):
+        if sim2[frozenset((i, j))][1] == 0:
+            sim2[frozenset((i, j))] = 0
+        else:
+            sim2[frozenset((i, j))] = (sim2[frozenset((i, j))][0] / sim2[frozenset((i, j))][1])
+
+
+# -- DIFERENÇAS --
+
+sim_diff = {}
+
+for i in range(len(nodes)):
+    for j in range(i + 1, len(nodes)):
+        sim_diff[(i, j)] = abs(sim2[frozenset((i, j))] - sim1[(i, j)])
+
+diff_average = 0
+
+for diff in sim_diff:
+    diff_average += sim_diff[diff]
+
+diff_average /= len(sim_diff)
+
+print(diff_average)
 
 
 # -- TESTES --
 
-print(similarities1[3, 5][0] / similarities1[3, 5][1])
-print(similarities4[frozenset((3, 5))][0] / similarities4[frozenset((3, 5))][1])
+#print(sim1[(3, 5)])
+#print(sim2[frozenset((3, 5))])

@@ -3,7 +3,8 @@ import itertools
 import random
 
 # -- Cria grafo --
-G = nx.fast_gnp_random_graph(300, 0.1)
+#G = nx.fast_gnp_random_graph(300, 0.1)
+#G = nx.powerlaw_cluster_graph(400, 30, 0.3)
 #G = nx.cycle_graph(10)
 nodes = list(G.nodes)
 
@@ -21,7 +22,7 @@ for comb in itertools.combinations(nodes, 2):
 # -- Algoritmo --
 for node in nodes:
     for i in G.neighbors(node):
-        for j in random.choices(nodes, k=10):
+        for j in random.choices(nodes, k=50):
             if j == i or j == node or similarities[frozenset((i, j))][2] == 1:
                 continue
             if j in G.neighbors(node):
@@ -35,7 +36,7 @@ for node in nodes:
 for comb in itertools.combinations(nodes, 2):
     if comb[0] == comb[1]:
         continue
-    sim = similarities[frozenset((i, j))][0] / similarities[frozenset((i, j))][1] 
+    sim = similarities[frozenset(comb)][0] / similarities[frozenset(comb)][1] 
     if sim < min_similarity:
         min_similarity = sim
     elif sim > max_similarity:
