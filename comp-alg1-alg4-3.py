@@ -62,8 +62,7 @@ def diff_calc(n, p, y1, y2):
 
     for node in nodes:      # O(n)
         for i in G.neighbors(node):     # O(len_neighbors)
-            for j in random.choices(nodes, k=int(math.sqrt(n))):      # O(sqrt(n))       
-            #for j in random.sample(nodes, k=math.sqrt(n)):      # O(sqrt(n))  
+            for j in random.sample(nodes, k=int(math.sqrt(n))):      # O(sqrt(n))       
                 if j == i or j == node or (frozenset((i, j)) in signal_array):
                     continue
                 if i in G.neighbors(node) and j in G.neighbors(node):       # O(len_neighbors)
@@ -114,12 +113,16 @@ def diff_calc(n, p, y1, y2):
 
     print("Average difference between algorithms:", diff_average)
 
+    print("Percentage of average difference and exact similarity:", diff_average/average_sim1)
+
+
+# -- EXECUTA TESTES --
 
 x1 = []
 x2 = []
 y1 = []
 y2 = []
-p = 0.3
+p = 0.1
 for i in range(200, 1001, 200):
     print("For n =", i)
     x1.append(i)
@@ -127,10 +130,7 @@ for i in range(200, 1001, 200):
     diff_calc(i, p, y1, y2)
     print("")
 
-print(x1)
-print(x2)
-print(y1)
-print(y2)
+# -- GERA GRÁFICO --
 
 plt.plot(x1, y1, label = "Algorithm 1")
 plt.plot(x2, y2, label = "Algorithm 2")
