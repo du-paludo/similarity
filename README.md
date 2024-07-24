@@ -1,6 +1,6 @@
 # Graph Similarity Estimation
 
-This project implementsa two different methods, one approximate and another precise, to calculate the similarity between nodes in a graph using the NetworkX library. The similarities are calculated based on the common neighbors of each pair of nodes.
+This project implements two different methods, one approximate and another precise, to calculate the similarity between nodes in a graph using the NetworkX library. The similarities are calculated based on the common neighbors of each pair of nodes.
 
 ## Files
 
